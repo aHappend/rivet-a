@@ -1,7 +1,40 @@
 {
   "chip": "RIVET-A2",
-  "phase": "checks",
-  "engineering_accepted": false,
+  "phase": "completed",
+  "engineering_accepted": true,
   "report_published": false,
-  "checks": []
+  "checks": [
+    {
+      "check": "check:behavior",
+      "status": "passed"
+    },
+    {
+      "check": "check:sensitivity",
+      "status": "passed"
+    },
+    {
+      "check": "check:synthesis",
+      "status": "passed"
+    }
+  ],
+  "reproduce": [
+    [
+      "python3",
+      "tests/verify.py",
+      "--check",
+      "behavior"
+    ],
+    [
+      "python3",
+      "tests/verify.py",
+      "--check",
+      "sensitivity"
+    ],
+    [
+      "python3",
+      "tests/verify.py",
+      "--check",
+      "synthesis"
+    ]
+  ]
 }
