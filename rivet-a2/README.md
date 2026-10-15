@@ -2,7 +2,7 @@
 
 AES-256 and GCM authenticated encryption/decryption.
 
-**Status:** Not accepted (verifier).
+**Status:** Not accepted (checks).
 
 The independently reviewed product report has not been published yet.
 

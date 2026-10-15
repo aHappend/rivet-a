@@ -7,13 +7,15 @@ AES-128 encryption/decryption, iterative rounds and transaction interfaces.
 ## Reproduce
 
 Requires Python 3, Icarus Verilog (`iverilog`, `vvp`) and Yosys.
-Run from this generation's directory:
+Run the admitted checks from this generation's directory:
 
 ```bash
 python3 tests/verify.py
 ```
 
 The test driver creates fresh local evidence. A published status is not a new run on your machine.
+
+Use a clean checkout or fresh output directories when a driver refuses existing evidence.
 
 [Specification](design/SPEC.md) · [Architecture](design/ARCHITECTURE.md) · [RTL](rtl/) · [Verification source](tests/) · [Recorded check statuses](STATUS.json)
 

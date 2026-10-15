@@ -8,5 +8,11 @@
       "check": "check:behavior",
       "status": "passed"
     }
+  ],
+  "reproduce": [
+    [
+      "python3",
+      "tests/verify.py"
+    ]
   ]
 }
