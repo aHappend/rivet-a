@@ -19,6 +19,8 @@ This repository publishes selected open engineering deliverables produced with V
 
 Accepted sources are published separately from in-progress status. Each generation keeps its own specification, RTL, executable verification and report. Planned generations are not completed products.
 
+An admitted product README is preserved byte-for-byte; when present, generated publication details and reproduction commands are in that generation's `DELIVERY.md`.
+
 ## Publication and scope
 
 Only selected product files, available predecessor reference RTL needed by regression tests, and a compact check-status record are exported. Accounts, model sessions, private experience, framework state and raw internal logs are excluded. Reports are published only after rendered-artifact approval. Internal relative evidence references in reports are provenance, not links to files included in this public package; regenerate public test evidence with the command above.
