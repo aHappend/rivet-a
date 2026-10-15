@@ -1,0 +1,12 @@
+{
+  "chip": "RIVET-A1",
+  "phase": "completed",
+  "engineering_accepted": true,
+  "report_published": true,
+  "checks": [
+    {
+      "check": "check:behavior",
+      "status": "passed"
+    }
+  ]
+}

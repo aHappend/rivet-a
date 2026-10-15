@@ -1,0 +1,365 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=22mm,headheight=14pt]{geometry}
+
+\usepackage{longtable,booktabs,array,hyperref,xcolor,tikz,fancyhdr}
+
+\usepackage{fontspec,xeCJK}
+
+\setmainfont[Ligatures=TeXOff]{Times New Roman}
+
+\setsansfont[Ligatures=TeXOff]{Times New Roman}
+
+\setmonofont[Ligatures=TeXOff,WordSpace={1,1,1}]{Times New Roman}
+
+\setCJKmainfont{Noto Serif CJK SC}
+
+\setCJKsansfont{Noto Serif CJK SC}
+
+\setCJKmonofont{Noto Serif CJK SC}
+
+\XeTeXgenerateactualtext=1
+
+\definecolor{vulcan}{HTML}{BB3E23}
+
+\pgfdeclarelayer{connections}\pgfdeclarelayer{edge labels}\pgfsetlayers{connections,main,edge labels}
+
+\hypersetup{hidelinks}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\setlength{\emergencystretch}{5em}\tolerance=2000\hbadness=10000
+
+\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
+
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small\sffamily VULCAN}
+
+\fancyhead[R]{\small Product design and verification}\fancyfoot[C]{\thepage}
+
+\begin{document}
+
+{\sffamily\huge\raggedright\textbf{RIVET-A1: Iterative AES-128 Encryption and Decryption RTL IP}\par}
+
+{\large Technical Design and Verification Report}\par
+
+16 October 2026 (\allowbreak{}UTC+\allowbreak{}8)\allowbreak{}\par\textcolor{vulcan}{\rule{\textwidth}{0.5pt}}
+
+\begin{abstract}
+
+RIVET-A1 implements a fixed-width AES-128 block engine for integration into a synchronous digital system. It supports encryption and decryption,\allowbreak{} caches all eleven round keys,\allowbreak{} preserves an opaque transaction tag,\allowbreak{} and provides independent valid/\allowbreak{}ready key,\allowbreak{} block-input and block-output channels. A shared 128-bit datapath performs initial AddRoundKey at block acceptance followed by exactly ten computational clock edges.
+
+
+Independent Icarus Verilog simulation checked the official FIPS 197 Appendix B and C.1 vectors in both directions,\allowbreak{} directed protocol boundaries,\allowbreak{} and three reproducible randomized scenarios. The baseline retired 217 checked results; two additional accepted blocks were intentionally canceled by reset. All five compiling functional mutations were detected. Generic Yosys synthesis retained 1,\allowbreak{}830 sequential bits and inferred zero latch cells. These results establish the delivered functional RTL scope,\allowbreak{} not physical timing closure or silicon security certification. [\allowbreak{}E010,\allowbreak{} E015]\allowbreak{}
+
+
+\end{abstract}
+
+\section{Architecture and design rationale}
+
+The engine combines a complete round-key cache with one iterative round datapath and a reserved output register. Key expansion,\allowbreak{} block computation and pending-output ownership are mutually exclusive. Although separate working-state and result registers exist,\allowbreak{} capacity is one outstanding block,\allowbreak{} not a two-stage transaction pipeline. This deliberate restriction simplifies key association,\allowbreak{} prevents replacement of a key while its result is pending,\allowbreak{} and guarantees uninterrupted computation regardless of downstream readiness. The cache contains 11 x 128 =\allowbreak{} 1,\allowbreak{}408 round-key bits. A 128-bit working register is reused for all rounds,\allowbreak{} while separate result registers retain data and metadata under backpressure. The public output connects directly to datapath registers,\allowbreak{} avoiding an additional completion stage. Shared package helpers provide constant substitution tables and finite-field operations; the named substitution,\allowbreak{} row-permutation and column-mixing modules are actual combinational datapath instances. [\allowbreak{}E001–E009]\allowbreak{}
+
+\begin{center}\begin{tikzpicture}[every node/.style={font=\small\sffamily},>=latex]
+
+\node[draw=vulcan,rounded corners,fill=vulcan!4,text width=3.8cm,minimum height=1cm,align=center] (b0) at (0.0,0.0) {B1: Transaction control};
+
+\node[draw=vulcan,rounded corners,fill=vulcan!4,text width=3.8cm,minimum height=1cm,align=center] (b1) at (5.4,0.0) {B2: Round-key cache};
+
+\node[draw=vulcan,rounded corners,fill=vulcan!4,text width=3.8cm,minimum height=1cm,align=center] (b2) at (10.8,0.0) {B3: Iterative datapath};
+
+\node[draw=vulcan,rounded corners,fill=vulcan!4,text width=3.8cm,minimum height=1cm,align=center] (b3) at (0.0,-4.6) {B4: Byte substitution};
+
+\node[draw=vulcan,rounded corners,fill=vulcan!4,text width=3.8cm,minimum height=1cm,align=center] (b4) at (5.4,-4.6) {B5: Row permutation};
+
+\node[draw=vulcan,rounded corners,fill=vulcan!4,text width=3.8cm,minimum height=1cm,align=center] (b5) at (10.8,-4.6) {B6: Column mixing};
+
+\begin{pgfonlayer}{connections}
+
+\draw[->,black!65,rounded corners=2pt] ([yshift=-0.107cm]b0.east) -- (2.300,-0.107) -- (2.300,-3.600) -- coordinate[midway] (e0) (5.293,-3.600) -- ([xshift=-0.107cm]b1.south);
+
+\draw[->,black!65,rounded corners=2pt] ([yshift=0.107cm]b0.east) -- (2.380,0.107) -- (2.380,-3.340) -- coordinate[midway] (e1) (10.608,-3.340) -- ([xshift=-0.192cm]b2.south);
+
+\draw[->,black!65,rounded corners=2pt] ([yshift=-0.107cm]b1.east) -- (7.860,-0.107) -- (7.860,-3.080) -- coordinate[midway] (e2) (-0.107,-3.080) -- ([xshift=-0.107cm]b0.south);
+
+\draw[->,black!65,rounded corners=2pt] ([yshift=-0.192cm]b2.east) -- (13.340,-0.192) -- (13.340,-2.820) -- coordinate[midway] (e3) (0.107,-2.820) -- ([xshift=0.107cm]b0.south);
+
+\draw[->,black!65,rounded corners=2pt] ([yshift=-0.064cm]b2.east) -- (13.420,-0.064) -- (13.420,-2.560) -- coordinate[midway] (e4) (5.507,-2.560) -- ([xshift=0.107cm]b1.south);
+
+\draw[->,black!65,rounded corners=2pt] ([yshift=0.107cm]b1.east) -- (8.100,0.107) -- (8.100,-2.300) -- coordinate[midway] (e5) (10.736,-2.300) -- ([xshift=-0.064cm]b2.south);
+
+\draw[->,black!65,rounded corners=2pt] ([yshift=0.064cm]b2.east) -- (13.580,0.064) -- (13.580,-2.040) -- coordinate[midway] (e6) (0.000,-2.040) -- ([xshift=0.000cm]b3.north);
+
+\draw[->,black!65] ([yshift=0.000cm]b3.east) -- coordinate[pos=0.25] (e7) ([yshift=0.000cm]b4.west);
+
+\draw[->,black!65,rounded corners=2pt] ([yshift=0.000cm]b4.east) -- (8.340,-4.600) -- (8.340,-1.520) -- coordinate[midway] (e8) (10.864,-1.520) -- ([xshift=0.064cm]b2.south);
+
+\draw[->,black!65,rounded corners=2pt] ([yshift=0.192cm]b2.east) -- (13.820,0.192) -- (13.820,-1.260) -- coordinate[midway] (e9) (10.800,-1.260) -- ([xshift=0.000cm]b5.north);
+
+\draw[->,black!65,rounded corners=2pt] ([yshift=0.000cm]b5.east) -- (13.900,-4.600) -- (13.900,-1.000) -- coordinate[midway] (e10) (10.992,-1.000) -- ([xshift=0.192cm]b2.south);
+
+\end{pgfonlayer}
+
+\begin{pgfonlayer}{edge labels}
+
+\node[fill=white,inner sep=1pt,font=\scriptsize] at (e0) {E1};
+
+\node[fill=white,inner sep=1pt,font=\scriptsize] at (e1) {E2};
+
+\node[fill=white,inner sep=1pt,font=\scriptsize] at (e2) {E3};
+
+\node[fill=white,inner sep=1pt,font=\scriptsize] at (e3) {E4};
+
+\node[fill=white,inner sep=1pt,font=\scriptsize] at (e4) {E5};
+
+\node[fill=white,inner sep=1pt,font=\scriptsize] at (e5) {E6};
+
+\node[fill=white,inner sep=1pt,font=\scriptsize] at (e6) {E7};
+
+\node[fill=white,inner sep=1pt,font=\scriptsize] at (e7) {E8};
+
+\node[fill=white,inner sep=1pt,font=\scriptsize] at (e8) {E9};
+
+\node[fill=white,inner sep=1pt,font=\scriptsize] at (e9) {E10};
+
+\node[fill=white,inner sep=1pt,font=\scriptsize] at (e10) {E11};
+
+\end{pgfonlayer}
+
+\end{tikzpicture}\end{center}
+
+{\small Functional block map, not a gate-level netlist. Edge identifiers match the directed relationships below. Crossings do not denote junctions; separate attachment points preserve arrow directions.}
+
+{\small\begin{longtable}{@{}L{0.24\textwidth}L{0.7\textwidth}@{}}\toprule
+
+\textbf{Block} & \textbf{Responsibility}\\\midrule\endhead
+
+B1: Transaction control & rivet\_\allowbreak{}a1\_\allowbreak{}top arbitrates key and block offers,\allowbreak{} derives readiness and busy status,\allowbreak{} and permits internal load/\allowbreak{}start pulses only on accepted public handshakes.\\[3pt]
+
+B2: Round-key cache & rivet\_\allowbreak{}a1\_\allowbreak{}key\_\allowbreak{}schedule captures RK0,\allowbreak{} generates RK1 through RK10 sequentially,\allowbreak{} and exposes an indexed untransformed 128-bit round key.\\[3pt]
+
+B3: Iterative datapath & rivet\_\allowbreak{}a1\_\allowbreak{}datapath captures block metadata,\allowbreak{} performs initial key addition,\allowbreak{} sequences ten rounds,\allowbreak{} and owns the working-state and elastic result registers.\\[3pt]
+
+B4: Byte substitution & rivet\_\allowbreak{}a1\_\allowbreak{}sbox applies sixteen parallel forward or inverse byte substitutions to the working state.\\[3pt]
+
+B5: Row permutation & rivet\_\allowbreak{}a1\_\allowbreak{}shiftrows implements forward or inverse cyclic row shifts in the FIPS column-major state layout.\\[3pt]
+
+B6: Column mixing & rivet\_\allowbreak{}a1\_\allowbreak{}mixcolumns performs four forward or inverse finite-field column products. Datapath selection places key addition correctly and bypasses mixing in the final round.\\[3pt]
+
+\bottomrule\end{longtable}}
+
+{\small\begin{longtable}{@{}L{0.24\textwidth}L{0.7\textwidth}@{}}\toprule
+
+\textbf{Directed relationship} & \textbf{Meaning}\\\midrule\endhead
+
+E1: B1 to B2 & Accepted key and load control\\[3pt]
+
+E2: B1 to B3 & Accepted block,\allowbreak{} direction,\allowbreak{} tag and start\\[3pt]
+
+E3: B2 to B1 & Expansion and loaded status\\[3pt]
+
+E4: B3 to B1 & Active and output-valid ownership\\[3pt]
+
+E5: B3 to B2 & Round-key index\\[3pt]
+
+E6: B2 to B3 & Selected round key\\[3pt]
+
+E7: B3 to B4 & Working state and captured direction\\[3pt]
+
+E8: B4 to B5 & Substituted state\\[3pt]
+
+E9: B5 to B3 & Shifted state for key addition and final-round selection\\[3pt]
+
+E10: B3 to B6 & Selected mixing operand and direction\\[3pt]
+
+E11: B6 to B3 & Mixed state for next-state selection\\[3pt]
+
+\bottomrule\end{longtable}}
+
+\section{Interfaces and configuration}
+
+{\small\begin{longtable}{@{}L{0.2\textwidth}L{0.12\textwidth}L{0.1\textwidth}L{0.48\textwidth}@{}}\toprule
+
+\textbf{Signal /\allowbreak{} group} & \textbf{Direction} & \textbf{Width} & \textbf{Contract}\\\midrule\endhead
+
+clk,\allowbreak{} rst\_\allowbreak{}n & Input & 1 bit each & Single rising-edge clock domain with active-low asynchronous reset. Reset assertion cancels all work; integration must release reset synchronously to clk.\\[3pt]
+
+key\_\allowbreak{}valid,\allowbreak{} key\_\allowbreak{}in & Input & 1 bit,\allowbreak{} 128 bits & Key offer and payload. Transfer occurs only when key\_\allowbreak{}valid and key\_\allowbreak{}ready are both high before a rising edge. Hold the offer and payload until acceptance.\\[3pt]
+
+key\_\allowbreak{}ready,\allowbreak{} key\_\allowbreak{}loaded & Output & 1 bit each & key\_\allowbreak{}ready permits a replacement-key transaction only while idle. key\_\allowbreak{}loaded indicates availability of the complete eleven-key cache; acceptance of a new key clears it until expansion finishes.\\[3pt]
+
+in\_\allowbreak{}valid,\allowbreak{} in\_\allowbreak{}enc\_\allowbreak{}dec & Input & 1 bit each & Block offer and operation: 0 encrypts,\allowbreak{} 1 decrypts. Direction is captured only on an accepted block handshake.\\[3pt]
+
+in\_\allowbreak{}block,\allowbreak{} in\_\allowbreak{}tag\_\allowbreak{}id & Input & 128 bits,\allowbreak{} 8 bits & Block and opaque tag,\allowbreak{} held stable with the offer until acceptance. Tags may repeat or wrap; values 0 and 255 are legal.\\[3pt]
+
+in\_\allowbreak{}ready & Output & 1 bit & High only when a complete key is loaded,\allowbreak{} the engine is idle,\allowbreak{} and key\_\allowbreak{}valid is low. No block is accepted or buffered while this signal is low.\\[3pt]
+
+out\_\allowbreak{}valid,\allowbreak{} out\_\allowbreak{}block,\allowbreak{} out\_\allowbreak{}tag\_\allowbreak{}id,\allowbreak{} out\_\allowbreak{}enc\_\allowbreak{}dec & Output & 1 bit,\allowbreak{} 128 bits,\allowbreak{} 8 bits,\allowbreak{} 1 bit & Registered result with original metadata. All four fields remain stable while out\_\allowbreak{}valid is high and out\_\allowbreak{}ready is low. Payload registers may retain retired values while out\_\allowbreak{}valid is low.\\[3pt]
+
+out\_\allowbreak{}ready & Input & 1 bit & Retires a result on a rising edge with out\_\allowbreak{}valid high. It does not stall computational rounds or allow same-edge replacement input acceptance.\\[3pt]
+
+busy,\allowbreak{} err\_\allowbreak{}unloaded\_\allowbreak{}key & Output & 1 bit each & busy covers expansion,\allowbreak{} computation and pending output. err\_\allowbreak{}unloaded\_\allowbreak{}key is permanently zero: unloaded-key attempts are prevented by in\_\allowbreak{}ready gating rather than reported as accepted errors.\\[3pt]
+
+\bottomrule\end{longtable}}
+
+{\small\begin{longtable}{@{}L{0.23\textwidth}L{0.12\textwidth}L{0.57\textwidth}@{}}\toprule
+
+\textbf{Parameter} & \textbf{Default} & \textbf{Meaning /\allowbreak{} supported values}\\\midrule\endhead
+
+Product configuration & Fixed AES-128 & No configurable module parameters. Block width and key width are 128 bits,\allowbreak{} round count is 10,\allowbreak{} cache depth is 11 keys,\allowbreak{} tag width is 8 bits,\allowbreak{} and outstanding block capacity is one.\\[3pt]
+
+\bottomrule\end{longtable}}
+
+\section{Behavior and corner cases}
+
+\subsection{Byte layout and arithmetic}
+
+Byte i occupies bits [\allowbreak{}127-8*\allowbreak{}i -: 8]\allowbreak{}; byte 0 is [\allowbreak{}127:120]\allowbreak{} and byte 15 is [\allowbreak{}7:0]\allowbreak{}. State element [\allowbreak{}r,\allowbreak{}c]\allowbreak{} is byte 4*\allowbreak{}c+\allowbreak{}r,\allowbreak{} so ordinary printed FIPS hexadecimal vectors require no byte reversal. Arithmetic is unsigned over GF(\allowbreak{}2\textasciicircum{}8)\allowbreak{},\allowbreak{} reduced modulo x\textasciicircum{}8+\allowbreak{}x\textasciicircum{}4+\allowbreak{}x\textasciicircum{}3+\allowbreak{}x+\allowbreak{}1,\allowbreak{} represented by 0x11B. Forward column mixing uses first-row coefficients 02,\allowbreak{}03,\allowbreak{}01,\allowbreak{}01; inverse mixing uses 0E,\allowbreak{}0B,\allowbreak{}0D,\allowbreak{}09 and their cyclic matrix rows.
+
+\subsection{Encryption and decryption}
+
+Encryption begins with RK0 addition,\allowbreak{} applies nine SubBytes/\allowbreak{}ShiftRows/\allowbreak{}MixColumns/\allowbreak{}AddRoundKey rounds,\allowbreak{} then omits mixing in round ten with RK10. Decryption begins with RK10,\allowbreak{} uses RK9 through RK1 with inverse substitution,\allowbreak{} inverse row shifting,\allowbreak{} key addition and inverse mixing,\allowbreak{} then finishes without mixing using RK0. The shared path performs inverse substitution before inverse shifting,\allowbreak{} which is equivalent because byte substitution is position-independent. Key addition remains before inverse mixing; cached keys are not inverse-transformed.
+
+\subsection{Key expansion and reuse}
+
+At accepted key edge K0,\allowbreak{} RK0 is captured,\allowbreak{} key\_\allowbreak{}loaded clears and busy asserts. RotWord,\allowbreak{} SubWord and Rcon generate one additional key on each subsequent edge. K1 through K9 store RK1 through RK9; K10 stores RK10 and asserts key\_\allowbreak{}loaded. The earliest block acceptance is K11. The complete cache persists across blocks until replacement or reset.
+
+\subsection{Exact block timing and throughput}
+
+Handshakes use pre-edge values; state updates are post-edge values. At B0,\allowbreak{} accepted input undergoes initial AddRoundKey and its tag/\allowbreak{}direction are captured. B1 through B9 execute ordinary rounds; B10 executes the final round and asserts out\_\allowbreak{}valid,\allowbreak{} irrespective of out\_\allowbreak{}ready. Earliest retirement is B11,\allowbreak{} and earliest next acceptance is B12. Thus cached-key initiation interval is at least 12 clocks,\allowbreak{} with ten clock periods from acceptance to result availability. At an externally established clock frequency f,\allowbreak{} the unstalled architectural payload-rate ceiling is 128*\allowbreak{}f/\allowbreak{}12 bits per second; no operating frequency was measured.
+
+\subsection{Arbitration and elastic output}
+
+Outside reset,\allowbreak{} busy =\allowbreak{} expanding || active || out\_\allowbreak{}valid,\allowbreak{} key\_\allowbreak{}ready =\allowbreak{} !busy,\allowbreak{} and in\_\allowbreak{}ready =\allowbreak{} key\_\allowbreak{}loaded \&\& !busy \&\& !key\_\allowbreak{}valid. Simultaneous idle key and block offers therefore accept only the key. Busy offers are not transactions. The result slot is reserved at block acceptance,\allowbreak{} allowing computation to finish even under pre-existing backpressure. Retirement introduces a deliberate acceptance bubble and prevents old-key output from overlapping cache replacement.
+
+\subsection{Reset and cancellation}
+
+Asynchronous reset clears all public outputs,\allowbreak{} including readiness,\allowbreak{} status,\allowbreak{} error and result metadata,\allowbreak{} and invalidates cached keys. It cancels expansion,\allowbreak{} active processing and stalled output without later stale completion. A fresh key is required afterward. Readiness may rise combinationally after reset release. Clearing storage is a functional convention,\allowbreak{} not a certified zeroization guarantee.
+
+\section{Verification methods and measured results}
+
+\subsection{Independent AES correctness and official known answers}
+
+\textbf{Method.} The pure-Python oracle derives substitutions through finite-field inversion and affine transforms without importing RTL tables. It independently expands keys and implements both cipher directions,\allowbreak{} first checking literal Appendix B and C.1 answers before public-interface Icarus/\allowbreak{}vvp comparisons.
+
+\textbf{Result.} Both official vectors passed encryption and decryption. Appendix B maps plaintext 3243f6a8885a308d313198a2e0370734 under key 2b7e151628aed2a6abf7158809cf4f3c to ciphertext 3925841d02dc09fbdc118597196a0b32. Appendix C.1 maps 00112233445566778899aabbccddeeff under key 000102030405060708090a0b0c0d0e0f to 69c4e0d86a7b0430d8cdb78070b4c55a.
+
+{\small Evidence: E010,\allowbreak{} E015}
+
+\subsection{Seeded multiblock traffic,\allowbreak{} key reuse and round trips}
+
+\textbf{Method.} Public-pin scoreboarding used actual accepted handshakes,\allowbreak{} independent expected results,\allowbreak{} concurrent offers and randomized stalls. Each seed used eight accepted keys,\allowbreak{} eight blocks per key and sixteen round trips whose two directions were checked separately.
+
+\textbf{Result.} Seed 1 retired 64 blocks over 911 simulated cycles: 31 encryptions and 33 decryptions. Seed 17 retired 64 over 908 cycles: 28 encryptions and 36 decryptions. Seed 89 retired 64 over 910 cycles: 32 encryptions and 32 decryptions. Together these scenarios checked 192 outputs and 48 round trips; round-trip transactions are included in,\allowbreak{} not additional to,\allowbreak{} the block totals.
+
+{\small Evidence: E010,\allowbreak{} E015}
+
+\subsection{Timing,\allowbreak{} reset,\allowbreak{} capacity and output preservation}
+
+\textbf{Method.} Directed tests exercised unloaded-key offers,\allowbreak{} key priority,\allowbreak{} busy offers,\allowbreak{} extreme and repeated tags,\allowbreak{} zero/\allowbreak{}one/\allowbreak{}byte-distinct data,\allowbreak{} exact expansion/\allowbreak{}completion edges,\allowbreak{} output stalls and reset during expansion,\allowbreak{} processing and held output. The checker rejects active X/\allowbreak{}Z values and transaction-conservation failures.
+
+\textbf{Result.} The directed scenario ran 620 simulated cycles,\allowbreak{} accepted 27 blocks,\allowbreak{} retired 25 results and intentionally canceled two blocks. It checked 26 ten-edge computational completions,\allowbreak{} including a completed result subsequently canceled by reset. Eleven keys were accepted; ten expansions completed and one was canceled. Directed holds included 1,\allowbreak{} 32 and 40 cycles,\allowbreak{} with a maximum of 40. Across all four baseline scenarios,\allowbreak{} 219 blocks were accepted,\allowbreak{} 217 retired,\allowbreak{} two canceled and none remained outstanding.
+
+{\small Evidence: E010,\allowbreak{} E015}
+
+\subsection{Sensitivity to exercised functional defects}
+
+\textbf{Method.} Five isolated source-copy mutations changed sbox,\allowbreak{} shiftrows,\allowbreak{} mixcolumns,\allowbreak{} key\_\allowbreak{}schedule and round\_\allowbreak{}count behavior. Each compiled and simulated,\allowbreak{} then faced unchanged functional or timing assertions.
+
+\textbf{Result.} All five mutations were detected. The four arithmetic/\allowbreak{}key mutations produced incorrect Appendix B ciphertext at the expected completion edge. The round-count mutation asserted output-valid one edge early. Syntax failures and simulator exit status were not used as substitutes for functional detection; accepted sources remained unchanged.
+
+{\small Evidence: E010,\allowbreak{} E015}
+
+\subsection{Substantive complete-hierarchy synthesis with zero latches}
+
+\textbf{Method.} Yosys 0.33 performed hierarchy checking,\allowbreak{} process lowering,\allowbreak{} optimization,\allowbreak{} memory lowering and consistency assertions. To accommodate native frontend package-import limitations,\allowbreak{} generated copies replaced exact imports with the unmodified package body,\allowbreak{} retaining module boundaries and transformation records.
+
+\textbf{Result.} Synthesis retained the top,\allowbreak{} key schedule,\allowbreak{} datapath and three primitive instances. It reported zero consistency problems and zero latch cells. Sequential storage totaled 1,\allowbreak{}830 bits: 1,\allowbreak{}550 in the key schedule and 280 in the datapath,\allowbreak{} exceeding the respective minimum checks of 1,\allowbreak{}408 and 256 bits and the 1,\allowbreak{}600-bit overall threshold. Retained counts,\allowbreak{} scripts and netlists are under evidence/\allowbreak{}results/\allowbreak{}verifier-20261015T162132Z-1c59508d/\allowbreak{}synthesis/\allowbreak{}.
+
+{\small Evidence: E010,\allowbreak{} E015}
+
+\section{Integration and use}
+
+Use rtl/\allowbreak{}*\allowbreak{}.sv as production RTL and design/\allowbreak{}SPEC.md plus design/\allowbreak{}ARCHITECTURE.md as the integration contract. tests/\allowbreak{}verify.py is the independent verification entry; generated benches,\allowbreak{} mutation copies,\allowbreak{} traces and netlists are outputs rather than production dependencies.
+
+
+For static elaboration from the project root,\allowbreak{} use \texttt{iverilog -g2012 -t null -s rivet\_\allowbreak{}a1\_\allowbreak{}top rtl/\allowbreak{}rivet\_\allowbreak{}a1\_\allowbreak{}pkg.sv rtl/\allowbreak{}rivet\_\allowbreak{}a1\_\allowbreak{}sbox.sv rtl/\allowbreak{}rivet\_\allowbreak{}a1\_\allowbreak{}shiftrows.sv rtl/\allowbreak{}rivet\_\allowbreak{}a1\_\allowbreak{}mixcolumns.sv rtl/\allowbreak{}rivet\_\allowbreak{}a1\_\allowbreak{}key\_\allowbreak{}schedule.sv rtl/\allowbreak{}rivet\_\allowbreak{}a1\_\allowbreak{}datapath.sv rtl/\allowbreak{}rivet\_\allowbreak{}a1\_\allowbreak{}top.sv}. Preserve package-first ordering.
+
+
+Provide the clock and reset,\allowbreak{} assert reset,\allowbreak{} and release it synchronously. Hold a key offer through acceptance,\allowbreak{} wait for complete expansion,\allowbreak{} then submit blocks with stable direction and tag. Interpret transfers exclusively from valid/\allowbreak{}ready edges,\allowbreak{} not from valid alone or busy transitions.
+
+
+Provide downstream readiness or storage for results. Backpressure may extend output holding indefinitely,\allowbreak{} but prevents new keys and blocks from being accepted. Do not expect replacement acceptance on the output-retirement edge.
+
+
+The full verification command is \texttt{python3 tests/\allowbreak{}verify.py}; mutations and synthesis require no enabling flags. The recorded environment used Python 3.12.3,\allowbreak{} Icarus Verilog/\allowbreak{}vvp 12.0 and Yosys 0.33. The runner creates fresh evidence directories containing source hashes,\allowbreak{} tool receipts,\allowbreak{} scenario ledgers,\allowbreak{} traces,\allowbreak{} mutation findings and synthesis artifacts. The accepted run is indexed by evidence/\allowbreak{}results/\allowbreak{}verifier-20261015T162132Z-1c59508d/\allowbreak{}receipt.json.
+
+
+\section{Limitations and acceptance boundary}
+
+This delivery is functional AES-128 RTL IP. No FPGA demonstration,\allowbreak{} fabricated device,\allowbreak{} technology-mapped area,\allowbreak{} power measurement,\allowbreak{} maximum frequency,\allowbreak{} physical implementation or tapeout qualification is established. Generic sequential-bit and cell counts are not physical area or PPA results.
+
+
+The interface operates on individual 128-bit blocks only. Cipher modes,\allowbreak{} padding,\allowbreak{} authentication,\allowbreak{} key management,\allowbreak{} AES-192/\allowbreak{}AES-256 and multiblock pipelining are outside the implementation.
+
+
+Fixed computational latency does not establish resistance to power analysis,\allowbreak{} electromagnetic leakage,\allowbreak{} faults or other side channels. No masking,\allowbreak{} certified secure erasure or cryptographic validation certificate is claimed.
+
+
+Simulation and five targeted mutations establish the stated tested coverage,\allowbreak{} not exhaustive proof. No formal verification was performed. No baseline engineering defect or corrective RTL repair was recorded; injected defects were isolated sensitivity trials.
+
+
+The full suite was executed in the project workspace. A separate clean-directory or cross-environment reproduction was not demonstrated. External tool availability,\allowbreak{} reset electrical timing,\allowbreak{} clock constraints and target timing closure remain integration responsibilities.
+
+
+\appendix\section{Source inventory}
+
+Production inventory: 7 Verilog/\allowbreak{}SystemVerilog files; 314 nonblank,\allowbreak{} non-comment lines. Source size is not a correctness or quality metric.
+
+{\small\begin{longtable}{@{}L{0.61\textwidth}L{0.15\textwidth}L{0.15\textwidth}@{}}\toprule
+
+\textbf{Production file} & \textbf{Physical lines} & \textbf{Code lines}\\\midrule\endhead
+
+rtl/\allowbreak{}rivet\_\allowbreak{}a1\_\allowbreak{}datapath.sv & 76 & 72\\[3pt]
+
+rtl/\allowbreak{}rivet\_\allowbreak{}a1\_\allowbreak{}key\_\allowbreak{}schedule.sv & 50 & 48\\[3pt]
+
+rtl/\allowbreak{}rivet\_\allowbreak{}a1\_\allowbreak{}mixcolumns.sv & 23 & 23\\[3pt]
+
+rtl/\allowbreak{}rivet\_\allowbreak{}a1\_\allowbreak{}pkg.sv & 104 & 97\\[3pt]
+
+rtl/\allowbreak{}rivet\_\allowbreak{}a1\_\allowbreak{}sbox.sv & 14 & 14\\[3pt]
+
+rtl/\allowbreak{}rivet\_\allowbreak{}a1\_\allowbreak{}shiftrows.sv & 16 & 16\\[3pt]
+
+rtl/\allowbreak{}rivet\_\allowbreak{}a1\_\allowbreak{}top.sv & 46 & 44\\[3pt]
+
+\bottomrule\end{longtable}}
+
+\section{Verification record index}
+
+{\small\begin{longtable}{@{}L{0.57\textwidth}L{0.16\textwidth}L{0.17\textwidth}@{}}\toprule
+
+\textbf{Recorded check} & \textbf{Outcome} & \textbf{Execution time (\allowbreak{}s)\allowbreak{}}\\\midrule\endhead
+
+behavior & passed & 23.155\\[3pt]
+
+\bottomrule\end{longtable}}
+
+Execution times include tool and provider waiting; they are not hardware latency or model utilization.
+
+{\small\begin{longtable}{@{}L{0.12\textwidth}L{0.82\textwidth}@{}}\toprule
+
+\textbf{Reference} & \textbf{Original project-relative record}\\\midrule\endhead
+
+E010 & tests/\allowbreak{}verify.py\\[3pt]
+
+E015 & .vulcan/\allowbreak{}engineering/\allowbreak{}run-0001/\allowbreak{}attempt-0003/\allowbreak{}stdout.log\\[3pt]
+
+\bottomrule\end{longtable}}
+
+\section{Document provenance}
+
+Engineering was independently accepted for the recorded source and evidence identity. This is not exhaustive proof, hardware deployment or physical signoff. The companion REPORT.md records the exact report approval and source manifest, and links the English/Chinese journeys containing original failures and interventions. A report number identifies a generation attempt, not a new hardware revision.
+
+No developer attribution was supplied; none has been inferred.
+
+\end{document}
