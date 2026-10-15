@@ -21,7 +21,7 @@ Accepted sources are published separately from in-progress status. Each generati
 
 ## Publication and scope
 
-Only selected product files and a compact check-status record are exported. Accounts, model sessions, private experience, framework state and raw internal logs are excluded. Reports are published only after rendered-artifact approval. Internal relative evidence references in reports are provenance, not links to files included in this public package; regenerate public test evidence with the command above.
+Only selected product files, available predecessor reference RTL needed by regression tests, and a compact check-status record are exported. Accounts, model sessions, private experience, framework state and raw internal logs are excluded. Reports are published only after rendered-artifact approval. Internal relative evidence references in reports are provenance, not links to files included in this public package; regenerate public test evidence with the command above.
 
 No tapeout, measured PPA, side-channel certification or board-level performance is claimed.
 
