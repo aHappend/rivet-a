@@ -24,6 +24,8 @@
   "rivet-a1/rtl/rivet_a1_top.sv",
   "rivet-a1/tests/verify.py",
   "rivet-a2/README.md",
+  "rivet-a2/REPORT.pdf",
+  "rivet-a2/REPORT.tex",
   "rivet-a2/STATUS.json",
   "rivet-a2/design/ARCHITECTURE.md",
   "rivet-a2/design/SPEC.md",
