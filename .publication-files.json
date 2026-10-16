@@ -53,6 +53,8 @@
   "rivet-a2/tests/units.py",
   "rivet-a2/tests/verify.py",
   "rivet-a3/README.md",
+  "rivet-a3/REPORT.pdf",
+  "rivet-a3/REPORT.tex",
   "rivet-a3/STATUS.json",
   "rivet-a3/design/ARCHITECTURE.md",
   "rivet-a3/design/SPEC.md",

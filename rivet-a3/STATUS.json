@@ -2,7 +2,7 @@
   "chip": "RIVET-A3",
   "phase": "completed",
   "engineering_accepted": true,
-  "report_published": false,
+  "report_published": true,
   "checks": [
     {
       "check": "check:environment",
