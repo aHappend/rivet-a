@@ -2,7 +2,7 @@
 
 Multiple keys and contexts, scheduling and DMA.
 
-**Status:** Not accepted (recovery_review).
+**Status:** Not accepted (verifier).
 
 The independently reviewed product report has not been published yet.
 

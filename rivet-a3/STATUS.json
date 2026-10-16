@@ -1,6 +1,6 @@
 {
   "chip": "RIVET-A3",
-  "phase": "recovery_review",
+  "phase": "verifier",
   "engineering_accepted": false,
   "report_published": false,
   "checks": []
