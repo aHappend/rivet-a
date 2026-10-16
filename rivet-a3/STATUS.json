@@ -1,7 +1,162 @@
 {
   "chip": "RIVET-A3",
-  "phase": "review",
-  "engineering_accepted": false,
+  "phase": "completed",
+  "engineering_accepted": true,
   "report_published": false,
-  "checks": []
+  "checks": [
+    {
+      "check": "check:environment",
+      "status": "passed"
+    },
+    {
+      "check": "check:behavior",
+      "status": "passed"
+    },
+    {
+      "check": "check:boundaries",
+      "status": "passed"
+    },
+    {
+      "check": "check:synthesis",
+      "status": "passed"
+    },
+    {
+      "check": "check:checker_sensitivity",
+      "status": "passed"
+    },
+    {
+      "check": "check:clean_reproduction",
+      "status": "passed"
+    },
+    {
+      "check": "check:recovery-002-environment",
+      "status": "passed"
+    },
+    {
+      "check": "check:recovery-002-behavior",
+      "status": "passed"
+    },
+    {
+      "check": "check:recovery-002-boundaries",
+      "status": "passed"
+    },
+    {
+      "check": "check:recovery-002-synthesis",
+      "status": "passed"
+    },
+    {
+      "check": "check:recovery-002-checker-sensitivity",
+      "status": "passed"
+    },
+    {
+      "check": "check:recovery-002-clean-reproduction",
+      "status": "passed"
+    }
+  ],
+  "reproduce": [
+    [
+      "python3",
+      "tests/verify.py",
+      "--suite",
+      "environment",
+      "--output",
+      "evidence/mandatory-rerun-001/environment"
+    ],
+    [
+      "python3",
+      "tests/verify.py",
+      "--suite",
+      "behavior",
+      "--seeds",
+      "17,89,203",
+      "--capacities",
+      "1,3,16",
+      "--output",
+      "evidence/mandatory-rerun-001/behavior"
+    ],
+    [
+      "python3",
+      "tests/verify.py",
+      "--suite",
+      "boundaries",
+      "--output",
+      "evidence/mandatory-rerun-001/boundaries"
+    ],
+    [
+      "python3",
+      "tests/verify.py",
+      "--suite",
+      "synthesis",
+      "--output",
+      "evidence/mandatory-rerun-001/synthesis"
+    ],
+    [
+      "python3",
+      "tests/verify.py",
+      "--suite",
+      "checker-sensitivity",
+      "--output",
+      "evidence/mandatory-rerun-001/checker-sensitivity"
+    ],
+    [
+      "python3",
+      "tests/verify.py",
+      "--suite",
+      "reproduce",
+      "--output",
+      "evidence/mandatory-rerun-001/reproduce"
+    ],
+    [
+      "python3",
+      "tests/verify.py",
+      "--suite",
+      "environment",
+      "--output",
+      "evidence/recovery-002/environment"
+    ],
+    [
+      "python3",
+      "tests/verify.py",
+      "--suite",
+      "behavior",
+      "--seeds",
+      "17,89,203",
+      "--capacities",
+      "1,3,16",
+      "--output",
+      "evidence/recovery-002/behavior"
+    ],
+    [
+      "python3",
+      "tests/verify.py",
+      "--suite",
+      "boundaries",
+      "--output",
+      "evidence/recovery-002/boundaries"
+    ],
+    [
+      "python3",
+      "tests/verify.py",
+      "--suite",
+      "synthesis",
+      "--output",
+      "evidence/recovery-002/synthesis"
+    ],
+    [
+      "python3",
+      "tests/verify.py",
+      "--suite",
+      "checker-sensitivity",
+      "--output",
+      "evidence/recovery-002/checker-sensitivity"
+    ],
+    [
+      "python3",
+      "tests/verify.py",
+      "--suite",
+      "reproduce",
+      "--output",
+      "evidence/recovery-002/reproduce"
+    ]
+  ]
 }
