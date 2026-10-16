@@ -14,7 +14,7 @@
 |---|---|---|---|---|
 | 1 | [RIVET-A1](rivet-a1/) | AES-128 encryption/decryption, iterative rounds and transaction interfaces | Engineering accepted | [PDF](rivet-a1/REPORT.pdf) |
 | 2 | [RIVET-A2](rivet-a2/) | AES-256 and GCM authenticated encryption/decryption | Engineering accepted | [PDF](rivet-a2/REPORT.pdf) |
-| 3 | [RIVET-A3](rivet-a3/) | Multiple keys and contexts, scheduling and DMA | Not accepted (recovery_review) | Pending |
+| 3 | [RIVET-A3](rivet-a3/) | Multiple keys and contexts, scheduling and DMA | Not accepted (verifier) | Pending |
 
 `Engineering accepted` 表示原生工程验收已通过；`Not accepted` 表示尚未验收；`Pending` 表示报告尚未发布。规划不算成果，后续代际不覆盖前代目录。
 
