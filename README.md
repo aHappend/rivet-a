@@ -15,7 +15,7 @@ This repository publishes selected open engineering deliverables produced with V
 |---|---|---|---|---|
 | 1 | [RIVET-A1](rivet-a1/) | AES-128 encryption/decryption, iterative rounds and transaction interfaces | Engineering accepted | [PDF](rivet-a1/REPORT.pdf) |
 | 2 | [RIVET-A2](rivet-a2/) | AES-256 and GCM authenticated encryption/decryption | Engineering accepted | [PDF](rivet-a2/REPORT.pdf) |
-| 3 | [RIVET-A3](rivet-a3/) | Multiple keys and contexts, scheduling and DMA | Not accepted (verifier) | Pending |
+| 3 | [RIVET-A3](rivet-a3/) | Multiple keys and contexts, scheduling and DMA | Not accepted (checks) | Pending |
 
 Accepted sources are published separately from in-progress status. Each generation keeps its own specification, RTL, executable verification and report. Planned generations are not completed products.
 
