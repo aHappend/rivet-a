@@ -1,45 +1,42 @@
-<div align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="brand/logo-dark.svg">
-    <img src="brand/logo.svg" width="420" alt="Vulcan">
-  </picture>
-  <h1>Rivet-A · Authenticated Block Cipher & Crypto DMA Silicon</h1>
-  <p><strong>Synthesizable 100 MHz+ AES-128, AES-256-GCM AEAD & Multi-Context DMA Accelerators · Intel Arria 10 GX HIL</strong></p>
-  <p>
-    <img src="https://img.shields.io/badge/Platform-Intel_Arria_10_GX-0f766e?style=flat-square" alt="Platform">
-    <img src="https://img.shields.io/badge/Quartus_17.1_STA-100_MHz%2B_Closed-0f766e?style=flat-square" alt="STA">
-    <img src="https://img.shields.io/badge/PCIe_Gen3x8_HIL-100%25_Passed-1d4ed8?style=flat-square" alt="HIL">
-    <img src="https://img.shields.io/badge/Author-Sufeng_Guo_(MSRA)-334155?style=flat-square" alt="Author">
-    <img src="https://img.shields.io/badge/License-MIT-64748b?style=flat-square" alt="License">
-  </p>
-  <p>
-    <a href="https://ahappend.github.io/vulcan/">Website</a> ·
-    <a href="https://github.com/aHappend/vulcan-showcase">Vulcan Showcase</a> ·
-    <a href="https://github.com/aHappend/anvil-q">Anvil-Q (LLM)</a> ·
-    <a href="https://github.com/aHappend/anvil-e">Anvil-E (Embedding)</a> ·
-    <a href="https://github.com/aHappend/billet-t">Billet-T (FFT/DSP)</a> ·
-    <a href="https://github.com/aHappend/billet-f">Billet-F (FIR/IIR)</a> ·
-    <a href="https://github.com/aHappend/rivet-a">Rivet-A (AES-GCM)</a> ·
-    <a href="https://github.com/aHappend/rivet-h">Rivet-H (SHA/HMAC)</a> ·
-    <a href="https://github.com/aHappend/swage-s">Swage-S (ISP)</a> ·
-    <a href="https://github.com/aHappend/bellows-l">Bellows-L (LZ4)</a> ·
-    <a href="https://github.com/aHappend/crucible-g">Crucible-G (3D)</a> ·
-    <a href="https://github.com/aHappend/furnace-x">Furnace-X (SoC)</a> ·
-    <a href="README.zh-CN.md"><strong>中文文档</strong></a>
-  </p>
-</div>
+# Rivet-A — AES and authenticated-encryption RTL
 
----
+[English](README.md) · [简体中文](README.zh-CN.md) · [Repository guide / 文件导航](REPOSITORY_GUIDE.md)
 
-**Rivet** is the cryptography, checksum, and data-integrity silicon family in Vulcan's seven-family workshop matrix. **Rivet-A** delivers FIPS-197 and NIST SP 800-38D compliant hardware engines spanning AES-128 (`RIVET-A1`), AES-256-GCM AEAD (`RIVET-A2`), and 4-key/4-context priority-scheduled DMA crypto engines (`RIVET-A3`).
+Documentation updated: 2026-11-17. This page describes a repository snapshot, not a live job dashboard.
 
-## Silicon Signoff Matrix & Dual-Track Publications (`100 MHz+` Baseline)
+## Overview
 
-| Gen | Accelerator | Architecture & Numerical Scope | Quartus 17.1 STA (`10.0 ns`) | Intel Arria 10 GX Utilization | PCIe Gen3x8 HIL | Academic & Developer Reports |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Gen-1** | [**RIVET-A1**](rivet-a1/) | FIPS-197 AES-128 Encryption/Decryption · On-the-Fly Key Schedule & Tag-Preserving Handshake | `458.93 MHz` (`WNS +7.821 ns`) | `2,150 ALMs (0.50%) · 0 DSPs · 4 M20K` | **PASSED (3/3)** | [**Whitepaper PDF**](rivet-a1/SHOWCASE_REPORT.pdf) · [**Engineering PDF**](rivet-a1/REPORT.pdf) |
-| **Gen-2** | [**RIVET-A2**](rivet-a2/) | NIST SP 800-38D AES-128/256-GCM Authenticated Encryption & `GF(2^128)` GHASH Tag Engine | `440.33 MHz` (`WNS +7.729 ns`) | `4,680 ALMs (1.10%) · 0 DSPs · 8 M20K` | **PASSED (3/3)** | [**Whitepaper PDF**](rivet-a2/SHOWCASE_REPORT.pdf) · [**Engineering PDF**](rivet-a2/REPORT.pdf) |
-| **Gen-3** | [**RIVET-A3**](rivet-a3/) | 4-Key-Slot, 4-Context Priority-Scheduled AES-GCM & Descriptor-Driven Scatter-Gather DMA | `185.60 MHz` (`WNS +4.612 ns`) | `8,340 ALMs (1.95%) · 0 DSPs · 24 M20K` | **PASSED (3/3)** | [**Whitepaper PDF**](rivet-a3/SHOWCASE_REPORT.pdf) · [**Engineering PDF**](rivet-a3/REPORT.pdf) |
+**Rivet-A** publishes chip RTL, technical reports and verification artifacts. AES-128/256, GCM/GHASH and descriptor-driven multicontext cryptographic datapaths. References to standards describe engineering targets, not certification by a standards body.
+
+The chip project is public; Vulcan itself remains private and closed-source. Future public releases must be limited to chip technology and public reproducibility materials, excluding Vulcan internal architecture and operating materials. This refresh organizes documentation only; it is not a comprehensive disclosure audit of historical material and does not claim that the existing repository tree has undergone such clearance.
+
+## Scope and evidence
+
+Use the [exact-directory result index](REPOSITORY_GUIDE.md). Functional simulation, synthesis, standalone/virtual-pin timing, board-bridge probing, workload readback and system-software execution are different evidence scopes. A pass at one scope does not establish another. Existing historical results are retained; this documentation refresh neither upgrades nor invalidates them.
+
+Read timing, utilization and performance values from their specific records and applicability conditions; results from differently located copies are not merged. This page makes no fleet-wide claim of physical-board completion, full-model inference, physical Linux boot or measured power/energy efficiency.
+
+## Repository guide
+
+The [repository guide](REPOSITORY_GUIDE.md) lists existing source, constraints, tests, reports and result paths. Hyphenated, underscored and `chips/` directories can be different publication copies; none is silently designated authoritative, moved or deleted.
+
+Start reproduction from the selected chip’s public specification, test instructions and scripts. Tool, input and board requirements belong to that directory. Chip experiments were not rerun as part of this documentation update.
+
+## Existing chip directories
+
+| Chip / variant | Existing root paths | Public artifacts |
+| --- | --- | --- |
+| RIVET-A1 | [`rivet-a1/`](rivet-a1/) | [REPORT.md](rivet-a1/REPORT.md) · [REPORT.pdf](rivet-a1/REPORT.pdf) · [SHOWCASE_REPORT.pdf](rivet-a1/SHOWCASE_REPORT.pdf) · [SHOWCASE_REPORT.zh-CN.pdf](rivet-a1/SHOWCASE_REPORT.zh-CN.pdf) |
+| RIVET-A2 | [`rivet-a2/`](rivet-a2/) | [REPORT.md](rivet-a2/REPORT.md) · [REPORT.pdf](rivet-a2/REPORT.pdf) · [SHOWCASE_REPORT.pdf](rivet-a2/SHOWCASE_REPORT.pdf) · [SHOWCASE_REPORT.zh-CN.pdf](rivet-a2/SHOWCASE_REPORT.zh-CN.pdf) |
+| RIVET-A3 | [`rivet-a3/`](rivet-a3/) | [REPORT.md](rivet-a3/REPORT.md) · [REPORT.pdf](rivet-a3/REPORT.pdf) · [SHOWCASE_REPORT.pdf](rivet-a3/SHOWCASE_REPORT.pdf) · [SHOWCASE_REPORT.zh-CN.pdf](rivet-a3/SHOWCASE_REPORT.zh-CN.pdf) |
+
+## Architecture catalog and publications
+
+| Generation | Chip | Architecture / research scope | Record navigation | Reports |
+| --- | --- | --- | --- | --- |
+| **Gen-1** | [**RIVET-A1**](rivet-a1/) | FIPS-197 AES-128 Encryption/Decryption · On-the-Fly Key Schedule & Tag-Preserving Handshake | [Exact-directory records](REPOSITORY_GUIDE.md) | [**Whitepaper PDF**](rivet-a1/SHOWCASE_REPORT.pdf) · [**Engineering PDF**](rivet-a1/REPORT.pdf) |
+| **Gen-2** | [**RIVET-A2**](rivet-a2/) | NIST SP 800-38D AES-128/256-GCM Authenticated Encryption & `GF(2^128)` GHASH Tag Engine | [Exact-directory records](REPOSITORY_GUIDE.md) | [**Whitepaper PDF**](rivet-a2/SHOWCASE_REPORT.pdf) · [**Engineering PDF**](rivet-a2/REPORT.pdf) |
+| **Gen-3** | [**RIVET-A3**](rivet-a3/) | 4-Key-Slot, 4-Context Priority-Scheduled AES-GCM & Descriptor-Driven Scatter-Gather DMA | [Exact-directory records](REPOSITORY_GUIDE.md) | [**Whitepaper PDF**](rivet-a3/SHOWCASE_REPORT.pdf) · [**Engineering PDF**](rivet-a3/REPORT.pdf) |
 
 ## Academic Product Whitepaper Visual Gallery
 
@@ -70,17 +67,11 @@
   </tr>
 </table>
 
-## Vulcan Seven-Family Workshop Silicon Matrix
+## Related projects
 
-| Silicon Family | Workshop Metaphor | Domain & Series Repositories |
-| :--- | :--- | :--- |
-| **Anvil** *(Primary Focus)* | Heavy forge anvil bearing core compute loads | AI & Large-Model Compute — [**Anvil-Q** (Quantized LLMs)](https://github.com/aHappend/anvil-q) · [**Anvil-E** (Multimodal Embeddings)](https://github.com/aHappend/anvil-e) |
-| **Billet** | Raw metal stock shaped and combined into systems | Digital Signal Processing — [**Billet-T** (FFT/Spectral)](https://github.com/aHappend/billet-t) · [**Billet-F** (FIR/SOS-IIR Filters)](https://github.com/aHappend/billet-f) |
-| **Rivet** | Small, critical, rock-solid fasteners | Cryptography & Data Integrity — [**Rivet-A** (AES/GCM/DMA)](https://github.com/aHappend/rivet-a) · [**Rivet-H** (SHA-256/512/HMAC)](https://github.com/aHappend/rivet-h) |
-| **Swage** | Die-forming tool shaping inputs into target forms | Image Processing & ISP — [**Swage-S** (2D Scaler, 3×3 Spatial Filter, Bayer Demosaic, CSC)](https://github.com/aHappend/swage-s) |
-| **Bellows** | Expanding/contracting continuous airflow | Streaming Data Compression — [**Bellows-L** (LZ4 Decompressor, Hash-Table Compressor, XXH32 DMA)](https://github.com/aHappend/bellows-l) |
-| **Crucible** | Vessel fusing diverse materials into form | Graphics Processing & Rendering — [**Crucible-G** (Triangle Setup, Tile Rasterizer, Z-Buffer & Texture Shader)](https://github.com/aHappend/crucible-g) |
-| **Furnace** | Industrial furnace integrating multiple stages | Heterogeneous SoCs — [**Furnace-X** (Multi-Engine AI + DSP + Crypto + ISP + Compression SoC)](https://github.com/aHappend/furnace-x) |
-
----
-<p align="center"><sub>Author: <strong>Sufeng Guo</strong> · Microsoft Research Asia · <a href="mailto:sufeng_guo@smail.nju.edu.cn">sufeng_guo@smail.nju.edu.cn</a> · <a href="LICENSE">MIT License</a></sub></p>
+- AI / embeddings: [Anvil-Q](https://github.com/aHappend/anvil-q), [Anvil-E](https://github.com/aHappend/anvil-e), [Anvil-QN](https://github.com/aHappend/anvil-qn), [Anvil-EN](https://github.com/aHappend/anvil-en), [Anvil-D](https://github.com/aHappend/anvil-d).
+- Systems: [Hammer-V](https://github.com/aHappend/hammer-v), [Furnace-X](https://github.com/aHappend/furnace-x).
+- DSP / vision: [Billet-F](https://github.com/aHappend/billet-f), [Billet-T](https://github.com/aHappend/billet-t), [Swage-S](https://github.com/aHappend/swage-s).
+- Data / security / graphics: [Bellows-L](https://github.com/aHappend/bellows-l), [Bellows-N](https://github.com/aHappend/bellows-n), [Rivet-A](https://github.com/aHappend/rivet-a), [Rivet-H](https://github.com/aHappend/rivet-h), [Crucible-G](https://github.com/aHappend/crucible-g), [SABLE](https://github.com/aHappend/sable).
+- [Public fleet catalog](https://github.com/aHappend/vulcan-showcase). Related independent research: [ACE-2](https://github.com/aHappend/ace-2), [ACE-3](https://github.com/aHappend/ace-3); these retain their own provenance and acceptance boundaries.
+- DSpark is a research direction, not a published chip delivery in this repository; no implementation or repository link is asserted here.
